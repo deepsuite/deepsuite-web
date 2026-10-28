@@ -1,0 +1,273 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------------
+   DeepSuite design tokens
+   Light-first: warm-white and white surfaces, navy type, restrained teal.
+   Dark navy is reserved for the hero, product demonstrations and select
+   conversion moments.
+   ------------------------------------------------------------------------ */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --color-navy: #101820;
+  --color-slate-deep: #17232d;
+  --color-graphite: #27343e;
+  --color-paper: #f7f8f6;
+  --color-white: #ffffff;
+  --color-ink: #101820;
+  --color-ink-soft: #3a4751;
+  --color-muted: #5f6c78;
+  --color-muted-dark: #9aa6b0;
+  --color-line: #e3e8ea;
+  --color-line-strong: #cfd7db;
+  --color-line-dark: #2d3943;
+
+  --color-teal: #35c6b1;
+  --color-teal-ink: #0d7c6d; /* AA on white for text */
+  --color-teal-wash: #e8f7f4;
+  --color-indigo: #7778e8;
+  --color-indigo-ink: #4c4dc0;
+  --color-indigo-wash: #efeffc;
+  --color-amber: #d99a3c;
+  --color-rose: #d9645a;
+
+  --text-display: clamp(2.6rem, 1.5rem + 3.4vw, 4.6rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.035em;
+  --text-h1: clamp(2.2rem, 1.5rem + 2.8vw, 3.75rem);
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h2: clamp(1.85rem, 1.35rem + 1.9vw, 3rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h3: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.015em;
+  --text-lead: clamp(1.075rem, 1rem + 0.3vw, 1.25rem);
+  --text-lead--line-height: 1.6;
+
+  --container-site: 1280px;
+  --container-prose: 44rem;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --animate-pulse-soft: pulse-soft 3.2s ease-in-out infinite;
+  --animate-flow: flow 6s linear infinite;
+  --animate-fade-up: fade-up 0.5s var(--ease-out-quart) both;
+  --animate-caret: caret 1s steps(1) infinite;
+
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes flow {
+    to {
+      stroke-dashoffset: -120;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes caret {
+    50% {
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: 6rem;
+  }
+  body {
+    background: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-teal) 30%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-teal-ink);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--color-teal);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-site {
+    width: 100%;
+    max-width: var(--container-site);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container-site {
+      padding-inline: 2rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .container-site {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-teal-ink);
+  }
+  .on-dark .eyebrow {
+    color: var(--color-teal);
+  }
+
+  /* Hairline grid texture for dark technical surfaces. */
+  .grid-texture {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .grid-texture-light {
+    background-image:
+      linear-gradient(to right, rgb(16 24 32 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(16 24 32 / 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Long-form reading typography for articles and industry pages. */
+  .prose-ds {
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+  .prose-ds > * + * {
+    margin-top: 1.15em;
+  }
+  .prose-ds h2 {
+    color: var(--color-ink);
+    font-size: 1.65rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    margin-top: 2.4em;
+    scroll-margin-top: 7rem;
+  }
+  .prose-ds h3 {
+    color: var(--color-ink);
+    font-size: 1.2rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    margin-top: 1.8em;
+  }
+  .prose-ds a {
+    color: var(--color-teal-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .prose-ds ul {
+    padding-left: 1.2rem;
+    list-style: none;
+  }
+  .prose-ds ul > li {
+    position: relative;
+    padding-left: 0.4rem;
+  }
+  .prose-ds ul > li + li {
+    margin-top: 0.45em;
+  }
+  .prose-ds ul > li::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 0.72em;
+    width: 0.45rem;
+    height: 1px;
+    background: var(--color-teal-ink);
+  }
+  .prose-ds ol {
+    padding-left: 1.4rem;
+    list-style: decimal;
+  }
+  .prose-ds ol > li::marker {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+  }
+  .prose-ds strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .prose-ds blockquote {
+    border-left: 2px solid var(--color-teal);
+    padding-left: 1.25rem;
+    color: var(--color-ink);
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+}
+
+/* Scroll reveal — content is visible by default; the class is only added
+   by the client observer, so no-JS and reduced-motion users see everything. */
+@layer utilities {
+  .reveal-ready {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.7s var(--ease-out-quart),
+      transform 0.7s var(--ease-out-quart);
+  }
+  .reveal-ready.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -1,0 +1,76 @@
+name: Build and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# One deployment at a time; never cancel a deployment that is already running.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Lint, type-check and build
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      # Public, build-time configuration. Set these under
+      # Settings → Secrets and variables → Actions → Variables.
+      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://deepsuite.app' }}
+      NEXT_PUBLIC_CONTACT_EMAIL: ${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}
+      NEXT_PUBLIC_SCHEDULING_URL: ${{ vars.NEXT_PUBLIC_SCHEDULING_URL }}
+      NEXT_PUBLIC_CONSULTATION_ENDPOINT: ${{ vars.NEXT_PUBLIC_CONSULTATION_ENDPOINT }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npx next typegen && npm run typecheck
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Verify export
+        run: |
+          test -f out/index.html
+          test -f out/404.html
+          test -f out/sitemap.xml
+          test "$(cat out/CNAME)" = "deepsuite.app"
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: out
+
+  deploy:
+    name: Deploy
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
