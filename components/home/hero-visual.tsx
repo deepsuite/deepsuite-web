@@ -5,14 +5,15 @@ import { Check, Sparkles } from 'lucide-react'
  * figures are sample values and the interface is not connected to any data.
  */
 const modules = [
-  { label: 'Finance', x: 70, y: 46 },
+  { label: 'Finance', x: 72, y: 50 },
   { label: 'Inventory', x: 250, y: 30 },
-  { label: 'Procurement', x: 430, y: 46 },
-  { label: 'Sales', x: 70, y: 186 },
-  { label: 'Operations', x: 250, y: 204 },
-  { label: 'Analytics', x: 430, y: 186 },
+  { label: 'Procurement', x: 428, y: 50 },
+  { label: 'Sales', x: 72, y: 190 },
+  { label: 'Operations', x: 250, y: 210 },
+  { label: 'Analytics', x: 428, y: 190 },
 ]
-const core = { x: 250, y: 117 }
+// Exact centre of the 500×240 viewBox; modules sit symmetrically around it.
+const core = { x: 250, y: 120, w: 176, h: 56 }
 
 const bars = [38, 52, 44, 61, 57, 70, 64, 79, 72, 86, 81, 92]
 
@@ -74,19 +75,37 @@ export function HeroVisual() {
                   </g>
                 ))}
                 <g>
-                  <rect x={core.x - 62} y={core.y - 22} width="124" height="44" rx="8" fill="#101820" stroke="#35c6b1" strokeOpacity="0.55" />
-                  <text x={core.x} y={core.y - 3} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="600">
+                  <rect
+                    x={core.x - core.w / 2}
+                    y={core.y - core.h / 2}
+                    width={core.w}
+                    height={core.h}
+                    rx="10"
+                    fill="#101820"
+                    stroke="#35c6b1"
+                    strokeOpacity="0.6"
+                  />
+                  <text x={core.x} y={core.y - 8} textAnchor="middle" dominantBaseline="central" fill="#fff" fontSize="13" fontWeight="600">
                     Domain core
                   </text>
-                  <text x={core.x} y={core.y + 12} textAnchor="middle" fill="#9aa6b0" fontSize="9" fontFamily="var(--font-geist-mono)">
+                  <text
+                    x={core.x}
+                    y={core.y + 11}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#9aa6b0"
+                    fontSize="8.5"
+                    letterSpacing="0.2"
+                    fontFamily="var(--font-geist-mono)"
+                  >
                     rules · actions · audit
                   </text>
                 </g>
                 {modules.map((m, i) => (
                   <g key={`n-${m.label}`}>
-                    <rect x={m.x - 48} y={m.y - 14} width="96" height="28" rx="6" fill="#17232d" stroke="#2d3943" />
-                    <circle cx={m.x - 36} cy={m.y} r="2.5" fill={i % 2 ? '#7778e8' : '#35c6b1'} className="animate-pulse-soft" style={{ animationDelay: `${i * 0.4}s` }} />
-                    <text x={m.x - 27} y={m.y + 4} fill="#d6dde2" fontSize="11">
+                    <rect x={m.x - 54} y={m.y - 14} width="108" height="28" rx="6" fill="#17232d" stroke="#2d3943" />
+                    <circle cx={m.x - 41} cy={m.y} r="2.5" fill={i % 2 ? '#7778e8' : '#35c6b1'} className="animate-pulse-soft" style={{ animationDelay: `${i * 0.4}s` }} />
+                    <text x={m.x - 32} y={m.y} dominantBaseline="central" fill="#d6dde2" fontSize="11">
                       {m.label}
                     </text>
                   </g>
@@ -147,7 +166,7 @@ export function HeroVisual() {
       {/* Proposed action — AI prepares, a person approves. */}
       <div
         aria-hidden="true"
-        className="relative mx-4 -mt-6 rounded-lg border border-line bg-white p-3.5 shadow-[0_20px_40px_-16px_rgba(16,24,32,0.45)] sm:absolute sm:-bottom-8 sm:left-8 sm:mx-0 sm:mt-0 sm:w-[300px] lg:-left-6"
+        className="relative mx-4 -mt-6 rounded-lg border border-line bg-white p-3.5 shadow-[0_20px_40px_-16px_rgba(16,24,32,0.45)] sm:absolute sm:-bottom-10 sm:right-8 sm:mx-0 sm:mt-0 sm:w-[300px] lg:-right-6"
       >
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 font-mono text-[0.6rem] tracking-wider text-indigo-ink uppercase">
