@@ -19,6 +19,9 @@ jobs:
   build:
     name: Lint, type-check and build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
     env:
       NEXT_TELEMETRY_DISABLED: 1
       # Public, build-time configuration. Set these under
@@ -37,6 +40,12 @@ jobs:
 
       - run: npm ci
 
+      # Resolves the base path: '' with the custom domain, '/deepsuite-web' without it.
+      - name: Configure Pages
+        id: pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v6
+
       - name: Lint
         run: npm run lint
 
@@ -45,6 +54,8 @@ jobs:
 
       - name: Build static export
         run: npm run build
+        env:
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
       - name: Verify export
         run: |
@@ -52,6 +63,7 @@ jobs:
           test -f out/404.html
           test -f out/sitemap.xml
           test "$(cat out/CNAME)" = "deepsuite.app"
+          echo "Base path: '${{ steps.pages.outputs.base_path }}'"
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'

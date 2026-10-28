@@ -99,7 +99,7 @@ export function SiteFooter() {
             <Link href="/privacy" className="hover:text-white">
               Privacy notice
             </Link>
-            <a href="/sitemap.xml" className="hover:text-white">
+            <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sitemap.xml`} className="hover:text-white">
               Sitemap
             </a>
           </div>
