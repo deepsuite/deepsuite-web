@@ -17,6 +17,32 @@ import {
 
 const MIN_FILL_MS = 3000
 
+/**
+ * Payload for form-to-email services (FormSubmit.co, Formspree). Keys are
+ * human-readable because they become the rows of the notification email;
+ * underscore keys are service controls (subject, reply-to, email layout).
+ */
+function toSubmission(input: ConsultationInput, source: string): Record<string, string> {
+  return {
+    _subject: `Consultation request — ${input.company}`,
+    _replyto: input.email,
+    _template: 'table',
+    _captcha: 'false',
+    Name: input.fullName,
+    'Work email': input.email,
+    Company: input.company,
+    Role: input.role,
+    Industry: input.industry,
+    'Organization size': input.organizationSize || 'Not provided',
+    'Project type': input.projectType,
+    'Current systems': input.currentSystems || 'Not provided',
+    Goals: input.goals,
+    'Preferred meeting time': input.preferredTime || 'Not provided',
+    Consent: input.consent ? 'Agreed to privacy notice' : 'No',
+    'Submitted from': source,
+  }
+}
+
 type Status =
   | { kind: 'idle' }
   | { kind: 'submitting' }
@@ -137,10 +163,12 @@ export function ConsultationForm({ industries, contactEmail, schedulingUrl, endp
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify({ type: 'consultation_request', source: window.location.href, ...input }),
+        body: JSON.stringify(toSubmission(input, window.location.href)),
       })
-      const data = (await res.json().catch(() => ({}))) as { errors?: FieldErrors }
-      if (res.ok) {
+      const data = (await res.json().catch(() => ({}))) as { errors?: FieldErrors; success?: boolean | string; ok?: boolean }
+      // FormSubmit answers 200 with `success: "false"` when delivery fails (e.g. before activation).
+      const rejected = data.success === false || data.success === 'false' || data.ok === false
+      if (res.ok && !rejected) {
         setStatus({ kind: 'sent' })
       } else if (res.status === 422 && data.errors) {
         setErrors(data.errors)

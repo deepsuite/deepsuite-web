@@ -69,9 +69,10 @@ One-time setup (already applied to `deepsuite/deepsuite-web`):
 
 ## Remaining integrations
 
-1. **Enquiry delivery.** GitHub Pages cannot run server code. Point `NEXT_PUBLIC_CONSULTATION_ENDPOINT` at a form service (such as Formspree), a small Cloudflare Worker, or a CRM webhook. Until then, the form validates and tells the visitor plainly that nothing was sent.
-   - The endpoint should re-validate input with the rules in `lib/validation.ts`, which are importable.
-   - Return `422 { errors }` to show field-level errors, and `429` when rate-limiting.
+1. **Enquiry delivery.** The form posts JSON to `NEXT_PUBLIC_CONSULTATION_ENDPOINT`. In production this is set as an Actions variable to [FormSubmit.co](https://formsubmit.co) (`https://formsubmit.co/ajax/<inbox>`), which emails each enquiry as a table to the inbox. Reply-to is set to the enquirer.
+   - **Activation:** the first submission makes FormSubmit email an activation link to the inbox. Nothing is delivered until it is clicked.
+   - **Hide the address:** after activation, FormSubmit emails a random alias string. Replace the address in the variable with that alias (`https://formsubmit.co/ajax/<alias>`) and re-run the deploy workflow, so the inbox is not exposed in the site's JavaScript.
+   - **Switching services:** the payload in `components/contact/consultation-form.tsx` (`toSubmission`) also works with Formspree. A custom endpoint can return `422 { errors }` for field errors and `429` when rate-limiting.
 2. **Spam protection.** The browser side checks a honeypot field and a minimum completion time. Real protection has to live at the endpoint: rate limiting, plus a challenge such as Cloudflare Turnstile if needed.
 3. **Scheduling.** Optionally set `NEXT_PUBLIC_SCHEDULING_URL`. No meeting is ever shown as booked.
 4. **Legal.** `/privacy` is a working summary marked as pending legal review, and it is `noindex`. Add terms and finalize the privacy text before launch.
