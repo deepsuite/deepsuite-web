@@ -16,6 +16,7 @@ import {
 } from '@/lib/validation'
 
 const MIN_FILL_MS = 3000
+const SUBMIT_TIMEOUT_MS = 30_000
 
 /**
  * Payload for form-to-email services (FormSubmit.co, Formspree). Keys are
@@ -105,6 +106,7 @@ export function ConsultationForm({ industries, contactEmail, schedulingUrl, endp
   // Compared against the submit event's timeStamp (same clock as performance.now()).
   const [startedAt] = useState(() => (typeof performance === 'undefined' ? 0 : performance.now()))
   const [goalsLength, setGoalsLength] = useState(0)
+  const [slow, setSlow] = useState(false)
   const summaryRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const statusRef = useRef<HTMLDivElement>(null)
@@ -159,11 +161,15 @@ export function ConsultationForm({ industries, contactEmail, schedulingUrl, endp
     }
 
     setStatus({ kind: 'submitting' })
+    const slowTimer = setTimeout(() => setSlow(true), 2500)
     try {
+      // A urlencoded body with only an Accept header is a CORS "simple request":
+      // the browser sends it directly, without a preflight OPTIONS round trip.
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify(toSubmission(input, window.location.href)),
+        headers: { accept: 'application/json' },
+        body: new URLSearchParams(toSubmission(input, window.location.href)),
+        signal: AbortSignal.timeout(SUBMIT_TIMEOUT_MS),
       })
       const data = (await res.json().catch(() => ({}))) as { errors?: FieldErrors; success?: boolean | string; ok?: boolean }
       // FormSubmit answers 200 with `success: "false"` when delivery fails (e.g. before activation).
@@ -180,8 +186,17 @@ export function ConsultationForm({ industries, contactEmail, schedulingUrl, endp
       } else {
         setStatus({ kind: 'error', message: 'Your enquiry could not be sent. Please try again in a moment.' })
       }
-    } catch {
-      setStatus({ kind: 'error', message: 'A network error prevented your enquiry from being sent. Check your connection and try again.' })
+    } catch (err) {
+      const timedOut = err instanceof DOMException && err.name === 'TimeoutError'
+      setStatus({
+        kind: 'error',
+        message: timedOut
+          ? 'The delivery service did not respond in time, so your enquiry may not have been sent. Please try again.'
+          : 'A network error prevented your enquiry from being sent. Check your connection and try again.',
+      })
+    } finally {
+      clearTimeout(slowTimer)
+      setSlow(false)
     }
     requestAnimationFrame(() => statusRef.current?.focus())
   }
@@ -380,7 +395,7 @@ export function ConsultationForm({ industries, contactEmail, schedulingUrl, endp
         >
           {status.kind === 'submitting' ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Sending…
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> {slow ? 'Delivering your enquiry…' : 'Sending…'}
             </>
           ) : (
             <>

@@ -21,8 +21,11 @@ const steps = [
 ]
 
 export default function ContactPage() {
+  const endpointOrigin = site.consultationEndpoint ? new URL(site.consultationEndpoint).origin : null
   return (
     <div className="bg-paper pt-28 lg:pt-36">
+      {/* Open the TLS connection to the delivery service before the visitor submits. */}
+      {endpointOrigin && <link rel="preconnect" href={endpointOrigin} crossOrigin="anonymous" />}
       <div className="container-site">
         <Breadcrumbs items={[{ name: 'Book a Consultation', href: '/contact' }]} />
       </div>
