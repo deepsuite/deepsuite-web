@@ -36,7 +36,10 @@ export default function PrivacyPage() {
               enquiry details to marketing lists and we do not sell personal information.
             </p>
             <h2>Analytics and cookies</h2>
-            <p>This website does not set advertising or analytics cookies.</p>
+            <p>
+              This website does not set advertising or analytics cookies. When you close the cookie notice, your browser stores
+              that choice locally so the notice is not shown again. That value never leaves your device.
+            </p>
             <h2>Retention</h2>
             <p>Enquiry details are retained only as long as needed to respond and to manage any resulting business relationship.</p>
             <h2>Your choices</h2>

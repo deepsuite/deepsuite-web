@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { CookieNotice } from '@/components/layout/cookie-notice'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { JsonLd } from '@/components/ui/json-ld'
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           {children}
         </main>
         <SiteFooter />
+        <CookieNotice />
         <RevealObserver />
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
       </body>
